@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #000000;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .coming-soon {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 3rem;
+            color: #ffffff;
+            text-shadow: 0 0 20px #ffffff, 0 0 40px #ffffff, 0 0 60px #ffffff;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        .discord-btn {
+            padding: 1rem 2rem;
+            background: #5865f2;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+        }
+
+        .discord-btn:hover {
+            background: #4752c4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.5);
+        }
+
+        .discord-btn:active {
+            transform: translateY(0);
+        }
+
+        @keyframes pulse {
+            0% { 
+                text-shadow: 0 0 20px #ffffff, 0 0 40px #ffffff, 0 0 60px #ffffff;
+                transform: scale(1);
+            }
+            100% { 
+                text-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff, 0 0 90px #ffffff;
+                transform: scale(1.02);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .coming-soon { 
+                font-size: 2.5rem; 
+                margin-bottom: 2rem;
+            }
+            .discord-btn { 
+                font-size: 1rem; 
+                padding: 0.8rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .coming-soon { 
+                font-size: 2rem; 
+                margin-bottom: 1.5rem;
+            }
+            .discord-btn { 
+                font-size: 0.9rem; 
+                padding: 0.7rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div class="content">
+        <h1 class="coming-soon">Coming Soon</h1>
+        <a href="#" class="discord-btn">Join Discord</a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Three.js setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 1);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Add lighting for 3D effect
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 10, 5);
+        scene.add(directionalLight);
+
+        // Create floating cubes
+        const cubes = [];
+        const cubeCount = window.innerWidth < 768 ? 25 : 50; // Fewer cubes on mobile
+
+        for (let i = 0; i < cubeCount; i++) {
+            const geometry = new THREE.BoxGeometry(
+                Math.random() * 2 + 0.5,
+                Math.random() * 2 + 0.5,
+                Math.random() * 2 + 0.5,
+                8, 8, 8 // Higher resolution segments
+            );
+            
+            const material = new THREE.MeshPhongMaterial({
+                color: new THREE.Color().setHSL(Math.random() * 0.1 + 0.0, 0.0, Math.random() * 0.5 + 0.3),
+                transparent: true,
+                opacity: Math.random() * 0.6 + 0.2,
+                shininess: 100,
+                specular: 0x222222
+            });
+            
+            const cube = new THREE.Mesh(geometry, material);
+            
+            // Random position
+            cube.position.x = (Math.random() - 0.5) * 100;
+            cube.position.y = (Math.random() - 0.5) * 100;
+            cube.position.z = (Math.random() - 0.5) * 100;
+            
+            // Random rotation
+            cube.rotation.x = Math.random() * Math.PI;
+            cube.rotation.y = Math.random() * Math.PI;
+            cube.rotation.z = Math.random() * Math.PI;
+            
+            // Random movement speed (slower on mobile)
+            const speedMultiplier = window.innerWidth < 768 ? 0.5 : 1;
+            cube.userData = {
+                speedX: (Math.random() - 0.5) * 0.02 * speedMultiplier,
+                speedY: (Math.random() - 0.5) * 0.02 * speedMultiplier,
+                speedZ: (Math.random() - 0.5) * 0.02 * speedMultiplier,
+                rotSpeedX: (Math.random() - 0.5) * 0.05 * speedMultiplier,
+                rotSpeedY: (Math.random() - 0.5) * 0.05 * speedMultiplier,
+                rotSpeedZ: (Math.random() - 0.5) * 0.05 * speedMultiplier
+            };
+            
+            cubes.push(cube);
+            scene.add(cube);
+        }
+
+        camera.position.z = 30;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            cubes.forEach(cube => {
+                // Move cubes
+                cube.position.x += cube.userData.speedX;
+                cube.position.y += cube.userData.speedY;
+                cube.position.z += cube.userData.speedZ;
+                
+                // Rotate cubes
+                cube.rotation.x += cube.userData.rotSpeedX;
+                cube.rotation.y += cube.userData.rotSpeedY;
+                cube.rotation.z += cube.userData.rotSpeedZ;
+                
+                // Wrap around screen
+                if (cube.position.x > 50) cube.position.x = -50;
+                if (cube.position.x < -50) cube.position.x = 50;
+                if (cube.position.y > 50) cube.position.y = -50;
+                if (cube.position.y < -50) cube.position.y = 50;
+                if (cube.position.z > 50) cube.position.z = -50;
+                if (cube.position.z < -50) cube.position.z = 50;
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Mouse movement effect (disabled on mobile for better performance)
+        if (window.innerWidth >= 768) {
+            document.addEventListener('mousemove', (e) => {
+                const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                
+                camera.position.x = mouseX * 8;
+                camera.position.y = mouseY * 8;
+                camera.lookAt(0, 0, 0);
+            });
+        }
+
+        // Touch support for mobile
+        if (window.innerWidth < 768) {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                
+                const deltaX = (touchX - touchStartX) / window.innerWidth;
+                const deltaY = (touchY - touchStartY) / window.innerHeight;
+                
+                camera.position.x = deltaX * 20;
+                camera.position.y = -deltaY * 20;
+                camera.lookAt(0, 0, 0);
+            });
+        }
+
+        // Discord button click handler
+        document.querySelector('.discord-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Replace with your actual Discord invite link
+            window.open('https://discord.gg/lithium', '_blank');
+        });
+    </script>
+</body>
+</html>
